@@ -13,8 +13,10 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  int _level = 2;
+  int _level = 1;
   int _score = 0;
+  int _mistakes = 0;
+  int _moves = 0;
   bool _inAnimation = false;
   late List<match_image_class.MatchImage> images;
   List<match_image_class.MatchImage> tappedCards = [];
@@ -89,48 +91,89 @@ class _GameScreenState extends State<GameScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: images.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: (_level < 3) ? 2 : 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10
-            ),
-            itemBuilder: (context, index) {
-              final card = images[index];
-              return FlipCard(
-                key: card.flipKey,
-                flipOnTouch: false,
-                direction: FlipDirection.HORIZONTAL,
-                front: GestureDetector(
-                  onTap: () => onCardTap(index),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.inverseSurface,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.help_outline_rounded,
-                        size: 40,
-                        color: Theme.of(context).colorScheme.onInverseSurface,
+          child: Column(
+            children: [
+              // ===== HEADER =====
+              Card(
+                color: Theme.of(context).colorScheme.error,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6)
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Center(
+                    child: Text(
+                      "00:00:00",
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onError
                       ),
                     ),
                   ),
+                )
+              ),
+
+              SizedBox(height: 16),
+
+              // ===== KARTU =====
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: images.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: (_level < 2) ? 2 : 4,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 2 / 3
                 ),
-                back: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(card.image),
-                      fit: BoxFit.cover,
+                itemBuilder: (context, index) {
+                  final card = images[index];
+                  return FlipCard(
+                    key: card.flipKey,
+                    flipOnTouch: false,
+                    direction: FlipDirection.HORIZONTAL,
+                    front: GestureDetector(
+                      onTap: () => onCardTap(index),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.help_outline_rounded,
+                            size: 40,
+                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }
+                    back: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(card.image),
+                            SizedBox(height: 18),
+                            Text(
+                              card.name,
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.onSecondaryContainer
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              ),
+            ]
           ),
         ),
       ),
