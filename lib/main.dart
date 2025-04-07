@@ -99,16 +99,17 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               // ===== HEADER ATAS =====
               Card(
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: ListTile(
                   leading: const Icon(Icons.person),
-                  title: const Text(
+                  title: Text(
                     "Welcome Back!",
                     style: TextStyle(
-                      fontWeight: FontWeight.w600
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   subtitle: Text("canonflow"),

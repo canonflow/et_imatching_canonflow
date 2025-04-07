@@ -18,12 +18,35 @@ class _GameScreenState extends State<GameScreen> {
   int _mistakes = 0;
   int _moves = 0;
   bool _inAnimation = false;
-  late List<match_image_class.MatchImage> images;
+
   List<match_image_class.MatchImage> tappedCards = [];
+  List<int> timers = [20, 40, 60];
+  late List<match_image_class.MatchImage> images;
+  late int _hitung;
 
   void initState() {
     super.initState();
     images = match_image_class.getImages(_level);
+    _hitung = timers[_level - 1];
+  }
+
+  String formatTimer(int hitung) {
+    // ~/ is a truncating division operator
+    var hours = (hitung ~/ 3600).toString().padLeft(2, '0');
+    var minutes = ((hitung % 3600) ~/ 60).toString().padLeft(2, '0');
+    var seconds = (hitung % 60).toString().padLeft(2, '0');
+
+    return "$hours:$minutes:$seconds";
+  }
+
+  // Trigger klo berhasil selesain level 1 dan 2
+  void nextLevel() {
+
+  }
+
+  // Trigger Timer habis, udh level 3
+  void endGame() {
+
   }
 
   void onCardTap(int index) {
@@ -52,10 +75,12 @@ class _GameScreenState extends State<GameScreen> {
             second.isOpen = true;
           } else {
             // Tutup lagi
+            _mistakes++;
             first.flipKey.currentState?.toggleCard();
             second.flipKey.currentState?.toggleCard();
           }
           _inAnimation = false;
+          _moves++;
 
           tappedCards.clear();
         });
@@ -93,7 +118,7 @@ class _GameScreenState extends State<GameScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // ===== HEADER =====
+              // ===== TIMER =====
               Card(
                 color: Theme.of(context).colorScheme.error,
                 shape: RoundedRectangleBorder(
@@ -104,7 +129,7 @@ class _GameScreenState extends State<GameScreen> {
                   padding: EdgeInsets.symmetric(vertical: 4),
                   child: Center(
                     child: Text(
-                      "00:00:00",
+                      formatTimer(_hitung),
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onError
                       ),
@@ -122,8 +147,8 @@ class _GameScreenState extends State<GameScreen> {
                 itemCount: images.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: (_level < 2) ? 2 : 4,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
                   childAspectRatio: 2 / 3
                 ),
                 itemBuilder: (context, index) {
@@ -137,7 +162,7 @@ class _GameScreenState extends State<GameScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
                           child: Icon(
@@ -152,7 +177,12 @@ class _GameScreenState extends State<GameScreen> {
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.secondary,
+                            width: 6,
+                            style: BorderStyle.solid
+                        ),
                       ),
                       child: Container(
                         child: Column(
@@ -173,7 +203,38 @@ class _GameScreenState extends State<GameScreen> {
                   );
                 }
               ),
-            ]
+
+              SizedBox(height: 14),
+              // ===== MOVES AND MISTAKES =====
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4)
+                ),
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "Mistakes: $_mistakes",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500
+                        ),
+                      ),
+                      Text(
+                        "Moves: $_moves",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w500
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
