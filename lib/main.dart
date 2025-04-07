@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
         
-              SizedBox(height: 46),
+              SizedBox(height: 35),
         
               // ===== PETUNJUK PERMAINAN =====
               Card(
