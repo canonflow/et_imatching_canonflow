@@ -26,7 +26,10 @@ class MyApp extends StatelessWidget {
           title: 'Project UTS',
           debugShowCheckedModeBanner: false,
           theme: Provider.of<ThemeProvider>(context).currentThemeData,
-          home: const MyHomePage(title: 'Project UTS ET'),
+          home: const MyHomePage(title: 'IMATCHING GAME'),
+          routes: {
+
+          },
         );
       },
     );
@@ -54,7 +57,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    IconData _themeIcon = Icons.light_mode_rounded;
     ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
@@ -89,31 +91,142 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: Container(
-        margin: EdgeInsets.all(15),
-        child: Column(
-          children: [
-            // Header Atas
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6)
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text(
-                  "Welcome Back!",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600
-                  ),
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // ===== HEADER ATAS =====
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)
                 ),
-                subtitle: Text("canonflow"),
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  leading: const Icon(Icons.person),
+                  title: const Text(
+                    "Welcome Back!",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600
+                    ),
+                  ),
+                  subtitle: Text("canonflow"),
+                ),
               ),
-            ),
+        
+              SizedBox(height: 46),
+        
+              // ===== PETUNJUK PERMAINAN =====
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                    // ===== TITLE =====
+                    ListTile(
+                      title: Center(
+                        child: Text(
+                          "Panduan Permainan",
+                          style: Theme.of(context).textTheme.titleLarge
+                        ),
+                      )
+                    ),
+                    // ===== CONTENT =====
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      child: Column(
+                        children: [
+                          // ===== IMAGE =====
+                          Container(
+                            width: 400,
+                            height: 200,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage("./assets/images/gambar-panduan.png"),
+                                    fit: BoxFit.cover
+                                ),
+                                borderRadius: BorderRadius.circular(6)
+                            ),
+                          ),
+        
+                          const SizedBox(height: 12),
+                          // ===== TEXT =====
+                          const Text.rich(
+                            TextSpan(
+                              text: "Untuk memulai permainan, pemain dapat menekan tombol ",
+                              children: [
+                                TextSpan(
+                                    text: "Play. ",
+                                    style: TextStyle(fontWeight: FontWeight.bold)
+                                ),
+                                TextSpan(
+                                  text: "Pemain dapat menekan grid untuk memunculkan gambar apa yang tersembunyi di baliknya.\n\nGambar "
+                                ),
+                                TextSpan(
+                                  text: "pertama yang diklik akan tetap muncul",
+                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                ),
+                                TextSpan(
+                                  text: ", hingga pemain membuka grid kedua untuk mencari pasangan gambarnya.\n\nApabila, gmabar kedua adalah pasangannya, maka "
+                                ),
+        
+                                TextSpan(
+                                  text: "gambar pertama dan kedua akan terus terbuka. ",
+                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                ),
+        
+                                TextSpan(
+                                  text: "Namun, apabila gambar kedua bukanlah pasangannya, maka gambar yang pertama dan kedua akan "
+                                ),
+        
+                                TextSpan(
+                                  text: "tertutup kembali.\n\n",
+                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                ),
 
-            // Petunjuk Permainan
+                                TextSpan(
+                                  text: "Setiap level permainan harus diselesaikan dalam rentang waktu tertentu. Pembagian ukuran tebakan dan batas waktu penyelesaian ditentukan sebagai berikut:\n"
+                                )
+                              ],
+                            )
+                          ),
 
-          ],
+                          // ===== KETENTUAN =====
+                          levelPoint("Level 1", "ukuran tebakan = 2x2, durasi timer = 20 detik."),
+                          SizedBox(height: 6),
+                          levelPoint("Level 2", "ukuran tebakan = 2x4, durasi timer = 40 detik."),
+                          SizedBox(height: 6),
+                          levelPoint("Level 3", "ukuran tebakan = 3x4, durasi timer = 60 detik."),
+
+                          // ===== PENJELASAN SKOR =====
+                          Text.rich(
+                            TextSpan(
+                              text: "\nSetiap gambar yang berhasil dicocokan dengan pasangannya memberikan ",
+                              children: [
+                                TextSpan(
+                                  text: "skor sebesar 10 poin bagi pemain.",
+                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                ),
+                                TextSpan(
+                                  text: " Apabila pemain kehabisan waktu, maka pemain akan dianggap "
+                                ),
+                                TextSpan(
+                                    text: "kalah.",
+                                    style: TextStyle(fontWeight: FontWeight.bold)
+                                ),
+                              ]
+                            )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -126,9 +239,33 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ),
         icon: const Icon(Icons.play_arrow_outlined),
-        // tooltip: 'Increment',
+        tooltip: 'Play',
       ), // This trailing comma makes auto-formatting nicer for build methods.
       drawer: myDrawer(),
+    );
+  }
+
+  Row levelPoint(String level, String desc) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(Icons.play_arrow_rounded, size: 16),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '$level ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: desc),
+              ],
+            ),
+            style: TextStyle(fontSize: 14),
+          ),
+        )
+      ],
     );
   }
 
@@ -175,6 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icons.login_rounded,
                 color: Theme.of(context).colorScheme.error,
             ),
+            onTap: () {},
           )
         ],
       ),
