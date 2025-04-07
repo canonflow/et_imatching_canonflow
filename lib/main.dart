@@ -1,4 +1,5 @@
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
+import 'package:et_imatching_canonflow/screens/game.dart';
 // import 'package:et_imatching_canonflow/theme/CustomTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
           theme: Provider.of<ThemeProvider>(context).currentThemeData,
           home: const MyHomePage(title: 'IMATCHING GAME'),
           routes: {
-
+            'game': (context) => const GameScreen()
           },
         );
       },
@@ -230,7 +231,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, 'game');
+        },
         label: const Text(
           "Play",
           style: TextStyle(
