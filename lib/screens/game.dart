@@ -14,7 +14,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  int _level = 1;
+  int _level = 2;
   int _score = 0;
   bool _inAnimation = false;
   late List<match_image_class.MatchImage> images;
@@ -95,7 +95,7 @@ class _GameScreenState extends State<GameScreen> {
             physics: NeverScrollableScrollPhysics(),
             itemCount: images.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2 + (_level - 1) * 2,
+              crossAxisCount: (_level < 3) ? 2 : 3,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10
             ),
@@ -105,17 +105,19 @@ class _GameScreenState extends State<GameScreen> {
                 key: card.flipKey,
                 flipOnTouch: false,
                 direction: FlipDirection.HORIZONTAL,
-                // front: Container(child: Text("FRONT")),
-                // back: Container(child: Text("BACK")),
                 front: GestureDetector(
                   onTap: () => onCardTap(index),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: Theme.of(context).colorScheme.inverseSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Icon(Icons.help_outline_rounded, size: 40),
+                      child: Icon(
+                        Icons.help_outline_rounded,
+                        size: 40,
+                        color: Theme.of(context).colorScheme.onInverseSurface,
+                      ),
                     ),
                   ),
                 ),
