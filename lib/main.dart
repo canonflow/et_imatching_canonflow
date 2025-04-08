@@ -1,9 +1,12 @@
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:et_imatching_canonflow/screens/game.dart';
+import 'package:et_imatching_canonflow/screens/login.dart';
 import 'package:et_imatching_canonflow/screens/result.dart';
 // import 'package:et_imatching_canonflow/theme/CustomTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'components/themeAppBar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +34,8 @@ class MyApp extends StatelessWidget {
           home: const MyHomePage(title: 'IMATCHING GAME'),
           routes: {
             'game': (context) => const GameScreen(),
-            'result': (context) => const ResultScreen()
+            'result': (context) => const ResultScreen(),
+            'login': (context) => const LoginScreen(),
           },
         );
       },
@@ -58,6 +62,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _user = "canonflow";
+
   @override
   Widget build(BuildContext context) {
     ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
@@ -68,32 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            onPressed: () {
-              if (_themeProvider.currentTheme == ThemeEnum.LIGHT) {
-                _themeProvider.changeTheme(ThemeEnum.DARK);
-              }
-              else {
-                _themeProvider.changeTheme(ThemeEnum.LIGHT);
-              }
-            },
-            icon: Icon(
-              _themeProvider.currentTheme == ThemeEnum.LIGHT
-                  ? Icons.light_mode_rounded
-                  : Icons.dark_mode_rounded
-            )
-          )
-        ],
-      ),
+      appBar: themeAppBar(context, widget.title, _themeProvider),
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.all(16),
@@ -114,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  subtitle: Text("canonflow"),
+                  subtitle: Text(_user),
                 ),
               ),
         
@@ -282,14 +263,14 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           UserAccountsDrawerHeader(
             accountName: Text(
-              "canonflow",
+              _user,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w500
               ),
             ),
             accountEmail: Text(
-              "test@gmail.com",
+              "$_user@gmail.com",
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -333,7 +314,35 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Theme.of(context).colorScheme.tertiary,
             ),
             onTap: () {
-              Navigator.pushNamed(context, 'result');
+              Navigator.pushNamed(
+                context,
+                'result',
+                arguments: {
+                  'score': 100,
+                  'mistakes': 2,
+                  'moves': 14,
+                  'user': 'canonflow'
+                }
+              );
+            },
+          ),
+          ListTile(
+            title: Text(
+                "Login",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.error,
+                )
+            ),
+            leading: Icon(
+              Icons.login_rounded,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                'login',
+              );
             },
           )
         ],

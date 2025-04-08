@@ -4,6 +4,7 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../components/themeAppBar.dart';
 import '../providers/ThemeProvider.dart';
 import 'package:et_imatching_canonflow/models/MatchImage.dart' as match_image_class;
 
@@ -21,6 +22,7 @@ class _GameScreenState extends State<GameScreen> {
   int _moves = 0;
   bool _inAnimation = false;
   int _pairs = 0;
+  String _user = "canonflow";
 
   List<match_image_class.MatchImage> tappedCards = [];
   List<int> timers = [20, 40, 60];
@@ -112,7 +114,8 @@ class _GameScreenState extends State<GameScreen> {
       arguments: {
         'score': _score,
         'moves': _moves,
-        'mistakes': _mistakes
+        'mistakes': _mistakes,
+        'user': _user
       }
     );
   }
@@ -167,27 +170,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text("IN GAME"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              if (_themeProvider.currentTheme == ThemeEnum.LIGHT) {
-                _themeProvider.changeTheme(ThemeEnum.DARK);
-              }
-              else {
-                _themeProvider.changeTheme(ThemeEnum.LIGHT);
-              }
-            },
-            icon: Icon(
-              _themeProvider.currentTheme == ThemeEnum.LIGHT
-                  ? Icons.light_mode_rounded
-                  : Icons.dark_mode_rounded
-            )
-          )
-        ],
-      ),
+      appBar: themeAppBar(context, "IN GAME", _themeProvider),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
