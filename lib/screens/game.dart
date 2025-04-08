@@ -72,7 +72,7 @@ class _GameScreenState extends State<GameScreen> {
         (_timer) {
           setState(() {
             if (_hitung == 0) {
-              nextLevel();
+              endGame();
             } else {
               _hitung--;
             }
