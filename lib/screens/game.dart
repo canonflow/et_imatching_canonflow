@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,16 +20,65 @@ class _GameScreenState extends State<GameScreen> {
   int _mistakes = 0;
   int _moves = 0;
   bool _inAnimation = false;
+  int _pairs = 0;
 
   List<match_image_class.MatchImage> tappedCards = [];
   List<int> timers = [20, 40, 60];
+
+  TextStyle? cardText;
+  late Timer _timer;
   late List<match_image_class.MatchImage> images;
   late int _hitung;
 
   void initState() {
-    super.initState();
-    images = match_image_class.getImages(_level);
+    // images = match_image_class.getImages(_level);
+    // _hitung = timers[_level - 1];
+    // startTimer();
+
+    // setupGame();
     _hitung = timers[_level - 1];
+    images = match_image_class.getImages(_level);
+    tappedCards.clear();
+    startTimer();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void setupGame() {
+    tappedCards.clear();
+    _hitung = timers[_level - 1];
+    images = match_image_class.getImages(_level);
+    _pairs = 0;
+    if (_level == 1) {
+      cardText = Theme.of(context).textTheme.titleLarge;
+    } else {
+      // Biar engga overflowed
+      cardText = TextStyle(
+        fontSize: 9.8,
+        fontWeight: FontWeight.bold
+      );
+    }
+    startTimer();
+  }
+
+  void startTimer() {
+    _timer = Timer.periodic(
+        Duration(seconds: 1),
+        (_timer) {
+          setState(() {
+            if (_hitung == 0) {
+              nextLevel();
+            } else {
+              _hitung--;
+            }
+          });
+        }
+    );
   }
 
   String formatTimer(int hitung) {
@@ -41,12 +92,29 @@ class _GameScreenState extends State<GameScreen> {
 
   // Trigger klo berhasil selesain level 1 dan 2
   void nextLevel() {
-
+    if (_level == 3) {
+      endGame();
+    } else {
+      _level++;
+      _timer.cancel();
+      setupGame();
+      // _hitung = timers[_level - 1];
+      // _timer.cancel();
+      // startTimer();
+    }
   }
 
   // Trigger Timer habis, udh level 3
   void endGame() {
-
+    Navigator.pushReplacementNamed(
+      context,
+      'result',
+      arguments: {
+        'score': _score,
+        'moves': _moves,
+        'mistakes': _mistakes
+      }
+    );
   }
 
   void onCardTap(int index) {
@@ -73,6 +141,13 @@ class _GameScreenState extends State<GameScreen> {
             _score += 10;
             first.isOpen = true;
             second.isOpen = true;
+            _pairs++;
+
+            // Kalo semua pasangannya sudah tertebak
+            if(_pairs == _level * 2) {
+              if (_level == 3) endGame();
+              else nextLevel();
+            }
           } else {
             // Tutup lagi
             _mistakes++;
@@ -192,7 +267,10 @@ class _GameScreenState extends State<GameScreen> {
                             SizedBox(height: 18),
                             Text(
                               card.name,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              // style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              //   color: Theme.of(context).colorScheme.onSecondaryContainer
+                              // ),
+                              style: ((cardText == null) ? Theme.of(context).textTheme.titleLarge : cardText)?.copyWith(
                                 color: Theme.of(context).colorScheme.onSecondaryContainer
                               ),
                             ),

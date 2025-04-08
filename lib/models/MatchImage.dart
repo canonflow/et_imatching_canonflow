@@ -45,7 +45,7 @@ List<MatchImage> getImages(int level) {
   //
   // duplicated.shuffle(Random());
 
-  List<MatchImage> copy = List.from(images)..shuffle(Random());
+  List<MatchImage> copy = List.from(images)..shuffle();
   copy = copy.take(level * 2).toList();
 
   List<MatchImage> duplicated = [...copy, ...copy];

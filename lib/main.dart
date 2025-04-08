@@ -1,5 +1,6 @@
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:et_imatching_canonflow/screens/game.dart';
+import 'package:et_imatching_canonflow/screens/result.dart';
 // import 'package:et_imatching_canonflow/theme/CustomTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
           theme: Provider.of<ThemeProvider>(context).currentThemeData,
           home: const MyHomePage(title: 'IMATCHING GAME'),
           routes: {
-            'game': (context) => const GameScreen()
+            'game': (context) => const GameScreen(),
+            'result': (context) => const ResultScreen()
           },
         );
       },
@@ -313,10 +315,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
             ),
             leading: Icon(
-                Icons.login_rounded,
+                Icons.logout_rounded,
                 color: Theme.of(context).colorScheme.error,
             ),
             onTap: () {},
+          ),
+          ListTile(
+            title: Text(
+                "Result",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.error,
+                )
+            ),
+            leading: Icon(
+              Icons.receipt_rounded,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
+            onTap: () {
+              Navigator.pushNamed(context, 'result');
+            },
           )
         ],
       ),
