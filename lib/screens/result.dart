@@ -20,7 +20,8 @@ class ResultScreen extends StatelessWidget {
 
     ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      appBar: themeAppBar(context, "RESULT", _themeProvider),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      appBar: themeAppBar(context, "RESULT", _themeProvider, Theme.of(context).colorScheme.surfaceContainer),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Text("RESULT"),

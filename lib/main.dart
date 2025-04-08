@@ -74,7 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: themeAppBar(context, widget.title, _themeProvider),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      appBar: themeAppBar(context, widget.title, _themeProvider, Theme.of(context).colorScheme.surfaceContainer),
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.all(16),
@@ -82,20 +83,29 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               // ===== HEADER ATAS =====
               Card(
-                color: Theme.of(context).colorScheme.secondaryContainer,
+                color: Theme.of(context).colorScheme.secondary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: ListTile(
-                  leading: const Icon(Icons.person),
+                  leading: Icon(
+                    Icons.person,
+                    color: Theme.of(context).colorScheme.onSecondary
+                  ),
                   title: Text(
                     "Welcome Back!",
                     style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  subtitle: Text(_user),
+                  subtitle: Text(
+                    _user,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary
+                    ),
+                  ),
                 ),
               ),
         
@@ -138,7 +148,10 @@ class _MyHomePageState extends State<MyHomePage> {
         
                           const SizedBox(height: 12),
                           // ===== TEXT =====
-                          const Text.rich(
+                          Text.rich(
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant
+                            ),
                             TextSpan(
                               text: "Untuk memulai permainan, pemain dapat menekan tombol ",
                               children: [
@@ -241,6 +254,9 @@ class _MyHomePageState extends State<MyHomePage> {
         Expanded(
           child: Text.rich(
             TextSpan(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant
+              ),
               children: [
                 TextSpan(
                   text: '$level ',

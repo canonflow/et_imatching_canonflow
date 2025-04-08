@@ -1,9 +1,14 @@
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:flutter/material.dart';
 
-AppBar themeAppBar(BuildContext context, String title, ThemeProvider _themeProvider, ) {
+AppBar themeAppBar(
+  BuildContext context,
+  String title,
+  ThemeProvider _themeProvider,
+  [Color? backgroundColor]
+) {
   return AppBar(
-    backgroundColor: Theme.of(context).colorScheme.surface,
+    backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
     title: Text(title),
     actions: [
       IconButton(

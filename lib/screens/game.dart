@@ -170,7 +170,8 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      appBar: themeAppBar(context, "IN GAME", _themeProvider),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      appBar: themeAppBar(context, "IN GAME", _themeProvider, Theme.of(context).colorScheme.surfaceContainer),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
