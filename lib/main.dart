@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
+import 'package:et_imatching_canonflow/models/User.dart';
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:et_imatching_canonflow/screens/game.dart';
 import 'package:et_imatching_canonflow/screens/login.dart';
@@ -11,10 +14,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'components/themeAppBar.dart';
 
 String _user = "";
+User? user;
 
-Future<String> checkUser() async {
+// Future<String> checkUser() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   return prefs.getString("username") ?? "";
+// }
+
+Future<bool> checkUser() async {
   final prefs = await SharedPreferences.getInstance();
-  return prefs.getString("username") ?? "";
+
+  final String? userJson = prefs.getString(LocalStorageKey.USERNAME);
+
+  if (userJson != null) {
+    Map<String, dynamic> userMap = jsonDecode(userJson);
+    user = User.fromJson(userMap);
+
+    return true;
+  }
+
+  return false;
 }
 
 void main() async {
@@ -22,9 +41,10 @@ void main() async {
   // await ThemeProvider.instance.changeTheme(ThemeEnum.LIGHT);
   await ThemeProvider.instance.loadThemeFromPrefs();
 
-  _user = await checkUser();
+  // _user = await checkUser();
+  bool isLoggedIn = await checkUser();
 
-  if (_user == "") {
+  if (!isLoggedIn) {
     // runApp(const MyLogin());
     runApp(
       ChangeNotifierProvider(
@@ -148,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   subtitle: Text(
-                    _user,
+                    user!.username,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSecondary
                     ),
@@ -326,14 +346,14 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           UserAccountsDrawerHeader(
             accountName: Text(
-              _user,
+              user!.username,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w500
               ),
             ),
             accountEmail: Text(
-              "$_user@gmail.com",
+              "${user!.username}@gmail.com",
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
               ),

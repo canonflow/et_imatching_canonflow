@@ -1,5 +1,6 @@
 import 'package:et_imatching_canonflow/components/themeAppBar.dart';
 import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
+import 'package:et_imatching_canonflow/models/User.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void doLogin() async {
     if (_username != "") {
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString(LocalStorageKey.USERNAME, _username);
+      User user = User(username: _username);
+      await user.saveToSharedPreferences();
 
       // Navigator.of(context).pushReplacement(
       //   MaterialPageRoute(builder: (_) => const MyApp()),
