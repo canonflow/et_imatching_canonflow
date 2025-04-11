@@ -1,7 +1,10 @@
 import 'package:et_imatching_canonflow/components/themeAppBar.dart';
+import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:et_imatching_canonflow/main.dart';
 
 import '../providers/ThemeProvider.dart';
 
@@ -10,20 +13,27 @@ class MyLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-            create: (_) => ThemeProvider.instance
-        )
-      ],
-      builder: (context, widget) {
-        return MaterialApp(
-          title: 'Project UTS',
-          debugShowCheckedModeBanner: false,
-          theme: Provider.of<ThemeProvider>(context).currentThemeData,
-          home: const LoginScreen(),
-        );
-      },
+    // return MultiProvider(
+    //   providers: [
+    //     ChangeNotifierProvider(
+    //         create: (_) => ThemeProvider.instance
+    //     )
+    //   ],
+    //   builder: (context, widget) {
+    //     return MaterialApp(
+    //       title: 'Project UTS',
+    //       debugShowCheckedModeBanner: false,
+    //       theme: Provider.of<ThemeProvider>(context).currentThemeData,
+    //       home: const LoginScreen(),
+    //     );
+    //   },
+    // );
+
+    return MaterialApp(
+      title: 'Project UTS',
+      debugShowCheckedModeBanner: false,
+      theme: Provider.of<ThemeProvider>(context).currentThemeData,
+      home: const LoginScreen(),
     );
   }
 }
@@ -40,20 +50,36 @@ class _LoginScreenState extends State<LoginScreen> {
   String _password = "";
   bool _obscurePassword = true;
 
-  void doLogin() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text("Status"),
-        content: Text("Login successful!"),
-        actions: <Widget>[
-          TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text("OK")
-          )
-        ],
-      )
-    );
+  void doLogin() async {
+    if (_username != "") {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString(LocalStorageKey.USERNAME, _username);
+
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(builder: (_) => const MyApp()),
+      // );
+
+      main();
+
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) => AlertDialog(
+      //     title: Text("Status"),
+      //     content: Text("Login successful!"),
+      //     actions: <Widget>[
+      //       TextButton(
+      //         onPressed: () {
+      //           // main();
+      //           Navigator.of(context).pushReplacement(
+      //             MaterialPageRoute(builder: (_) => const MyApp())
+      //           );
+      //         },
+      //         child: const Text("OK")
+      //       )
+      //     ],
+      //   )
+      // );
+    }
   }
 
   @override

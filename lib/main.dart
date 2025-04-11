@@ -1,3 +1,4 @@
+import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:et_imatching_canonflow/screens/game.dart';
 import 'package:et_imatching_canonflow/screens/login.dart';
@@ -5,13 +6,42 @@ import 'package:et_imatching_canonflow/screens/result.dart';
 // import 'package:et_imatching_canonflow/theme/CustomTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/themeAppBar.dart';
+
+String _user = "";
+
+Future<String> checkUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("username") ?? "";
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ThemeProvider.instance.changeTheme(ThemeEnum.LIGHT);
-  runApp(const MyApp());
+
+  _user = await checkUser();
+
+  if (_user == "") {
+    // runApp(const MyLogin());
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider.instance,
+        child: const MyLogin(),
+      ),
+    );
+  } else {
+    // runApp(const MyApp());
+    // _user = await checkUser();
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider.instance,
+        child: const MyApp(),
+      ),
+    );
+  }
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -20,26 +50,37 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-            create: (_) => ThemeProvider.instance
-        )
-      ],
-      builder: (context, widget) {
-        return MaterialApp(
-          title: 'Project UTS',
-          debugShowCheckedModeBanner: false,
-          theme: Provider.of<ThemeProvider>(context).currentThemeData,
-          home: const MyHomePage(title: 'IMATCHING GAME'),
-          routes: {
-            'game': (context) => const GameScreen(),
-            'result': (context) => const ResultScreen(),
-            'login': (context) => const LoginScreen(),
-          },
-        );
+    return MaterialApp(
+      title: 'Project UTS',
+      debugShowCheckedModeBanner: false,
+      theme: Provider.of<ThemeProvider>(context).currentThemeData,
+      home: const MyHomePage(title: 'IMATCHING GAME'),
+      routes: {
+        'game': (context) => const GameScreen(),
+        'result': (context) => const ResultScreen(),
+        'login': (context) => const LoginScreen(),
       },
     );
+    // return MultiProvider(
+    //   providers: [
+    //     ChangeNotifierProvider(
+    //         create: (_) => ThemeProvider.instance
+    //     )
+    //   ],
+    //   builder: (context, widget) {
+    //     return MaterialApp(
+    //       title: 'Project UTS',
+    //       debugShowCheckedModeBanner: false,
+    //       theme: Provider.of<ThemeProvider>(context).currentThemeData,
+    //       home: const MyHomePage(title: 'IMATCHING GAME'),
+    //       routes: {
+    //         'game': (context) => const GameScreen(),
+    //         'result': (context) => const ResultScreen(),
+    //         'login': (context) => const LoginScreen(),
+    //       },
+    //     );
+    //   },
+    // );
   }
 }
 
@@ -62,7 +103,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _user = "canonflow";
+
+  void doLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove(LocalStorageKey.USERNAME);
+    main();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -315,7 +361,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icons.logout_rounded,
                 color: Theme.of(context).colorScheme.error,
             ),
-            onTap: () {},
+            onTap: () {
+              doLogout();
+            },
           ),
           ListTile(
             title: Text(
