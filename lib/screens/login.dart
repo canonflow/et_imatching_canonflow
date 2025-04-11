@@ -57,10 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
       User user = User(username: _username);
       await user.saveToSharedPreferences();
 
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(builder: (_) => const MyApp()),
-      // );
-
       main();
 
       // showDialog(

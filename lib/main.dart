@@ -13,39 +13,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/themeAppBar.dart';
 
-String _user = "";
 User? user;
-
-// Future<String> checkUser() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   return prefs.getString("username") ?? "";
-// }
-
-Future<bool> checkUser() async {
-  final prefs = await SharedPreferences.getInstance();
-
-  final String? userJson = prefs.getString(LocalStorageKey.USERNAME);
-
-  if (userJson != null) {
-    Map<String, dynamic> userMap = jsonDecode(userJson);
-    user = User.fromJson(userMap);
-
-    return true;
-  }
-
-  return false;
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await ThemeProvider.instance.changeTheme(ThemeEnum.LIGHT);
   await ThemeProvider.instance.loadThemeFromPrefs();
 
-  // _user = await checkUser();
-  bool isLoggedIn = await checkUser();
+  user = await User.get();
 
-  if (!isLoggedIn) {
-    // runApp(const MyLogin());
+  if (user == null) {
     runApp(
       ChangeNotifierProvider(
         create: (_) => ThemeProvider.instance,
@@ -53,8 +30,6 @@ void main() async {
       ),
     );
   } else {
-    // runApp(const MyApp());
-    // _user = await checkUser();
     runApp(
       ChangeNotifierProvider(
         create: (_) => ThemeProvider.instance,
@@ -62,7 +37,6 @@ void main() async {
       ),
     );
   }
-  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

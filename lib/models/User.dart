@@ -31,6 +31,22 @@ class User {
     };
   }
 
+  // Get Currently Logged-In User
+  static Future<User?> get() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final String? userJson = prefs.getString(LocalStorageKey.USERNAME);
+
+    User? user;
+
+    if (userJson != null) {
+      Map<String, dynamic> userMap = jsonDecode(userJson);
+      user = User.fromJson(userMap);
+    }
+
+    return user;
+  }
+
   // Save to Shared Preferences
   Future<void> saveToSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
