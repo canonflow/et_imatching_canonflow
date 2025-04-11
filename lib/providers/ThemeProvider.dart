@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_theme/json_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum ThemeEnum { DARK, LIGHT }
 
@@ -19,9 +21,24 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeProvider._init();
 
+  Future<void> loadThemeFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? themeStr = prefs.getString(LocalStorageKey.THEME_MODE);
+
+    if (themeStr != null && themeStr == ThemeEnum.DARK.name) {
+      await changeTheme(ThemeEnum.DARK);
+    } else {
+      await changeTheme(ThemeEnum.LIGHT);
+    }
+  }
+
   Future<void> changeTheme(ThemeEnum theme) async {
     currentTheme = theme;
     await _generateThemeData();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(LocalStorageKey.THEME_MODE, theme.name);
+
     notifyListeners();
   }
 

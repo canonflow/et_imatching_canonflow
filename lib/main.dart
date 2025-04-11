@@ -19,7 +19,8 @@ Future<String> checkUser() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ThemeProvider.instance.changeTheme(ThemeEnum.LIGHT);
+  // await ThemeProvider.instance.changeTheme(ThemeEnum.LIGHT);
+  await ThemeProvider.instance.loadThemeFromPrefs();
 
   _user = await checkUser();
 
@@ -387,25 +388,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   'moves': 14,
                   'user': 'canonflow'
                 }
-              );
-            },
-          ),
-          ListTile(
-            title: Text(
-                "Login",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.error,
-                )
-            ),
-            leading: Icon(
-              Icons.login_rounded,
-              color: Theme.of(context).colorScheme.tertiary,
-            ),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                'login',
               );
             },
           )
