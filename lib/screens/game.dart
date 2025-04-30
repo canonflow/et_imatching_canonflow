@@ -1,12 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
+import 'package:et_imatching_canonflow/models/User.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/themeAppBar.dart';
 import '../providers/ThemeProvider.dart';
-import 'package:et_imatching_canonflow/models/MatchImage.dart' as match_image_class;
+import 'package:et_imatching_canonflow/models/MatchImage.dart'
+    as match_image_class;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -38,11 +43,18 @@ class _GameScreenState extends State<GameScreen> {
     // startTimer();
 
     // setupGame();
+
     _hitung = timers[_level - 1];
     images = match_image_class.getImages(_level);
     tappedCards.clear();
+    getCurrentUsername();
     startTimer();
     super.initState();
+  }
+
+  void getCurrentUsername() async {
+    User? currentUser = await User.get();
+    _user = currentUser!.username;
   }
 
   @override
@@ -60,27 +72,21 @@ class _GameScreenState extends State<GameScreen> {
       cardText = Theme.of(context).textTheme.titleLarge;
     } else {
       // Biar engga overflowed
-      cardText = TextStyle(
-        fontSize: 9.8,
-        fontWeight: FontWeight.bold
-      );
+      cardText = TextStyle(fontSize: 9.8, fontWeight: FontWeight.bold);
     }
     startTimer();
   }
 
   void startTimer() {
-    _timer = Timer.periodic(
-        Duration(seconds: 1),
-        (_timer) {
-          setState(() {
-            if (_hitung == 0) {
-              endGame();
-            } else {
-              _hitung--;
-            }
-          });
+    _timer = Timer.periodic(Duration(seconds: 1), (_timer) {
+      setState(() {
+        if (_hitung == 0) {
+          endGame();
+        } else {
+          _hitung--;
         }
-    );
+      });
+    });
   }
 
   String formatTimer(int hitung) {
@@ -107,7 +113,19 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // Trigger Timer habis, udh level 3
-  void endGame() {
+  void endGame() async {
+    try {
+      await User(
+        username: _user,
+        score: _score,
+        moves: _moves,
+        mistakes: _mistakes,
+      ).SaveHighScore();
+      print("save highscore succesful");
+    } catch (e) {
+      print('Error saving score: $e');
+    }
+
     Navigator.pushReplacementNamed(
       context,
       'result',
@@ -115,8 +133,8 @@ class _GameScreenState extends State<GameScreen> {
         'score': _score,
         'moves': _moves,
         'mistakes': _mistakes,
-        'user': _user
-      }
+        'user': _user,
+      },
     );
   }
 
@@ -147,9 +165,11 @@ class _GameScreenState extends State<GameScreen> {
             _pairs++;
 
             // Kalo semua pasangannya sudah tertebak
-            if(_pairs == _level * 2) {
-              if (_level == 3) endGame();
-              else nextLevel();
+            if (_pairs == _level * 2) {
+              if (_level == 3)
+                endGame();
+              else
+                nextLevel();
             }
           } else {
             // Tutup lagi
@@ -171,7 +191,12 @@ class _GameScreenState extends State<GameScreen> {
     ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-      appBar: themeAppBar(context, "IN GAME", _themeProvider, Theme.of(context).colorScheme.surfaceContainer),
+      appBar: themeAppBar(
+        context,
+        "IN GAME",
+        _themeProvider,
+        Theme.of(context).colorScheme.surfaceContainer,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -181,7 +206,7 @@ class _GameScreenState extends State<GameScreen> {
               Card(
                 color: Theme.of(context).colorScheme.error,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6)
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Padding(
@@ -189,12 +214,14 @@ class _GameScreenState extends State<GameScreen> {
                   child: Center(
                     child: Text(
                       formatTimer(_hitung),
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onError
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onError,
                       ),
                     ),
                   ),
-                )
+                ),
               ),
 
               SizedBox(height: 16),
@@ -208,7 +235,7 @@ class _GameScreenState extends State<GameScreen> {
                   crossAxisCount: (_level < 2) ? 2 : 4,
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
-                  childAspectRatio: 2 / 3
+                  childAspectRatio: 2 / 3,
                 ),
                 itemBuilder: (context, index) {
                   final card = images[index];
@@ -220,14 +247,18 @@ class _GameScreenState extends State<GameScreen> {
                       onTap: () => onCardTap(index),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondaryContainer,
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
                           child: Icon(
                             Icons.help_outline_rounded,
                             size: 40,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).colorScheme.onSecondaryContainer,
                           ),
                         ),
                       ),
@@ -238,9 +269,9 @@ class _GameScreenState extends State<GameScreen> {
                         color: Theme.of(context).colorScheme.secondaryContainer,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: Theme.of(context).colorScheme.secondary,
-                            width: 6,
-                            style: BorderStyle.solid
+                          color: Theme.of(context).colorScheme.secondary,
+                          width: 6,
+                          style: BorderStyle.solid,
                         ),
                       ),
                       child: Container(
@@ -254,23 +285,29 @@ class _GameScreenState extends State<GameScreen> {
                               // style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               //   color: Theme.of(context).colorScheme.onSecondaryContainer
                               // ),
-                              style: ((cardText == null) ? Theme.of(context).textTheme.titleLarge : cardText)?.copyWith(
-                                color: Theme.of(context).colorScheme.onSecondaryContainer
-                              ),
+                              style: ((cardText == null)
+                                      ? Theme.of(context).textTheme.titleLarge
+                                      : cardText)
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondaryContainer,
+                                  ),
                             ),
                           ],
                         ),
                       ),
                     ),
                   );
-                }
+                },
               ),
 
               SizedBox(height: 14),
               // ===== MOVES AND MISTAKES =====
               Card(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4)
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 color: Theme.of(context).colorScheme.primaryContainer,
                 child: Padding(
@@ -281,15 +318,17 @@ class _GameScreenState extends State<GameScreen> {
                       Text(
                         "Mistakes: $_mistakes",
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.w500
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
                         "Moves: $_moves",
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w500
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

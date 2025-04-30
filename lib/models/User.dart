@@ -9,7 +9,12 @@ class User {
   int moves;
   int score;
 
-  User({ required this.username, this.mistakes = 0, this.moves = 0, this.score = 0});
+  User({
+    required this.username,
+    this.mistakes = 0,
+    this.moves = 0,
+    this.score = 0,
+  });
 
   // Convert JSON to Class
   factory User.fromJson(Map<String, dynamic> json) {
@@ -17,7 +22,7 @@ class User {
       username: json['username'],
       mistakes: json['mistakes'],
       moves: json['moves'],
-      score: json['score']
+      score: json['score'],
     );
   }
 
@@ -27,7 +32,7 @@ class User {
       'username': username,
       'mistakes': mistakes,
       'moves': moves,
-      'score': score
+      'score': score,
     };
   }
 
@@ -58,88 +63,73 @@ class User {
   // Find User's High Score
   Future<int?> FindHighScore() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? highscoresJson = await prefs.getString(LocalStorageKey.HIGHSCORES);
+    final List<String>? highscoresList = prefs.getStringList(
+      LocalStorageKey.HIGHSCORES,
+    ); // Use getStringList
 
-    if (highscoresJson == null) return null;
+    if (highscoresList == null) return null;
 
-    // Decode
-    List<String> highscoresListMap = jsonDecode(highscoresJson);
-
-    // Convert into list of user
-    List<User> highscores = highscoresListMap
-      .map((json) => User.fromJson(jsonDecode(json)))
-      .toList();
-
-    // return highscores
-    //     .where((user) => user.username == username)
-    //     .firstOrNull;
+    // Convert JSON strings to User objects
+    List<User> highscores =
+        highscoresList.map((json) => User.fromJson(jsonDecode(json))).toList();
 
     final match = highscores.where((user) => user.username == username);
-
     return match.isNotEmpty ? match.first.score : null;
   }
 
   // Save User's High Score
   Future<void> SaveHighScore() async {
     final prefs = await SharedPreferences.getInstance();
+    final List<String>? highscoresList = prefs.getStringList(
+      LocalStorageKey.HIGHSCORES,
+    ); // Use getStringList
 
-    final String? highscoresJson = await prefs.getString(LocalStorageKey.HIGHSCORES);
+    List<User> highscores = [];
 
-    // Kalo blm ada yg main
-    if (highscoresJson == null) {
-      List<User> highscores = [User(username: username)];
-      List<String> highscoresJson = highscores
-        .map((user) => jsonEncode(user.toJson()))
-        .toList();
-
-      await prefs.setStringList(LocalStorageKey.HIGHSCORES, highscoresJson);
-    } else {
-      // Kalo udh ada yg main
-      // Cek apakah sudah pernah main sebelumnya
-
-      // Convert into list of user
-      List<String> highscoresListMap = jsonDecode(highscoresJson);
-      List<User> highscores = highscoresListMap
-          .map((json) => User.fromJson(jsonDecode(json)))
-          .toList();
-
-      final match = highscores
-        .where((user) => user.username == username);
-
-      if (match.isNotEmpty) {
-        // Udh pernah main
-        User user = match.first;
-        user.score = score;
-        user.moves = moves;
-        user.mistakes = mistakes;
-      } else {
-        // Belum pernah main
-        highscores.add(this);
-      }
-
-      // Simpan
-      final updatedJson = highscores
-        .map((user) => jsonEncode(user.toJson()))
-        .toList();
-
-      await prefs.setStringList(LocalStorageKey.HIGHSCORES, updatedJson);
+    if (highscoresList != null) {
+      // Convert JSON strings to User objects
+      highscores =
+          highscoresList
+              .map((json) => User.fromJson(jsonDecode(json)))
+              .toList();
     }
+
+    final existingUserIndex = highscores.indexWhere(
+      (user) => user.username == username,
+    );
+
+    if (existingUserIndex != -1) {
+      // Update existing user's score if current score is higher
+      if (score > highscores[existingUserIndex].score) {
+        highscores[existingUserIndex].score = score;
+        highscores[existingUserIndex].moves = moves;
+        highscores[existingUserIndex].mistakes = mistakes;
+      }
+    } else {
+      // Add new user
+      highscores.add(this);
+    }
+
+    // Convert back to JSON strings
+    final updatedJsonList =
+        highscores.map((user) => jsonEncode(user.toJson())).toList();
+
+    await prefs.setStringList(LocalStorageKey.HIGHSCORES, updatedJsonList);
   }
 
   // Get All High Scores
   static Future<List<User>?> GetAllHighscores() async {
     final prefs = await SharedPreferences.getInstance();
+    final List<String>? highscoresList = prefs.getStringList(
+      LocalStorageKey.HIGHSCORES,
+    ); // Use getStringList
 
-    final String? highscoresJson = await prefs.getString(LocalStorageKey.HIGHSCORES);
+    if (highscoresList == null) return null;
 
-    if (highscoresJson == null) return null;
+    List<User> highscores =
+        highscoresList.map((json) => User.fromJson(jsonDecode(json))).toList();
 
-    List<String> highscoresListMap = jsonDecode(highscoresJson);
-    
-    List<User> highscores= highscoresListMap
-      .map((user) => User.fromJson(jsonDecode(user)))
-      .toList();
-
+    highscores.sort((a, b) => b.score.compareTo(a.score));
     return highscores;
   }
 }

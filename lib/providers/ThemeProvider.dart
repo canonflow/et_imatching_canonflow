@@ -25,7 +25,7 @@ class ThemeProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     String? themeStr = prefs.getString(LocalStorageKey.THEME_MODE);
 
-    if (themeStr != null && themeStr == ThemeEnum.DARK.name) {
+    if (themeStr == ThemeEnum.DARK.name) {
       await changeTheme(ThemeEnum.DARK);
     } else {
       await changeTheme(ThemeEnum.LIGHT);

@@ -4,6 +4,7 @@ import 'package:et_imatching_canonflow/constants/LocalStorageKey.dart';
 import 'package:et_imatching_canonflow/models/User.dart';
 import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:et_imatching_canonflow/screens/game.dart';
+import 'package:et_imatching_canonflow/screens/highscore.dart';
 import 'package:et_imatching_canonflow/screens/login.dart';
 import 'package:et_imatching_canonflow/screens/result.dart';
 // import 'package:et_imatching_canonflow/theme/CustomTheme.dart';
@@ -54,6 +55,7 @@ class MyApp extends StatelessWidget {
         'game': (context) => const GameScreen(),
         'result': (context) => const ResultScreen(),
         'login': (context) => const LoginScreen(),
+        'highscore': (context) => const HighscoreScreen(),
       },
     );
     // return MultiProvider(
@@ -98,7 +100,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   void doLogout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(LocalStorageKey.USERNAME);
@@ -116,7 +117,12 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-      appBar: themeAppBar(context, widget.title, _themeProvider, Theme.of(context).colorScheme.surfaceContainer),
+      appBar: themeAppBar(
+        context,
+        widget.title,
+        _themeProvider,
+        Theme.of(context).colorScheme.surfaceContainer,
+      ),
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.all(16),
@@ -126,13 +132,13 @@ class _MyHomePageState extends State<MyHomePage> {
               Card(
                 color: Theme.of(context).colorScheme.secondary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6)
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: ListTile(
                   leading: Icon(
                     Icons.person,
-                    color: Theme.of(context).colorScheme.onSecondary
+                    color: Theme.of(context).colorScheme.onSecondary,
                   ),
                   title: Text(
                     "Welcome Back!",
@@ -144,18 +150,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   subtitle: Text(
                     user!.username,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondary
+                      color: Theme.of(context).colorScheme.onSecondary,
                     ),
                   ),
                 ),
               ),
-        
+
               SizedBox(height: 35),
-        
+
               // ===== PETUNJUK PERMAINAN =====
               Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
@@ -165,13 +171,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: Center(
                         child: Text(
                           "Panduan Permainan",
-                          style: Theme.of(context).textTheme.titleLarge
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
-                      )
+                      ),
                     ),
                     // ===== CONTENT =====
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 14,
+                      ),
                       child: Column(
                         children: [
                           // ===== IMAGE =====
@@ -179,91 +188,113 @@ class _MyHomePageState extends State<MyHomePage> {
                             width: 400,
                             height: 200,
                             decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage("./assets/images/gambar-panduan.png"),
-                                    fit: BoxFit.cover
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  "./assets/images/gambar-panduan.png",
                                 ),
-                                borderRadius: BorderRadius.circular(6)
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                           ),
-        
+
                           const SizedBox(height: 12),
                           // ===== TEXT =====
                           Text.rich(
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                             ),
                             TextSpan(
-                              text: "Untuk memulai permainan, pemain dapat menekan tombol ",
+                              text:
+                                  "Untuk memulai permainan, pemain dapat menekan tombol ",
                               children: [
                                 TextSpan(
-                                    text: "Play. ",
-                                    style: TextStyle(fontWeight: FontWeight.bold)
+                                  text: "Play. ",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 TextSpan(
-                                  text: "Pemain dapat menekan grid untuk memunculkan gambar apa yang tersembunyi di baliknya.\n\nGambar "
+                                  text:
+                                      "Pemain dapat menekan grid untuk memunculkan gambar apa yang tersembunyi di baliknya.\n\nGambar ",
                                 ),
                                 TextSpan(
                                   text: "pertama yang diklik akan tetap muncul",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 TextSpan(
-                                  text: ", hingga pemain membuka grid kedua untuk mencari pasangan gambarnya.\n\nApabila, gmabar kedua adalah pasangannya, maka "
-                                ),
-        
-                                TextSpan(
-                                  text: "gambar pertama dan kedua akan terus terbuka. ",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
-                                ),
-        
-                                TextSpan(
-                                  text: "Namun, apabila gambar kedua bukanlah pasangannya, maka gambar yang pertama dan kedua akan "
-                                ),
-        
-                                TextSpan(
-                                  text: "tertutup kembali.\n\n",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                  text:
+                                      ", hingga pemain membuka grid kedua untuk mencari pasangan gambarnya.\n\nApabila, gmabar kedua adalah pasangannya, maka ",
                                 ),
 
                                 TextSpan(
-                                  text: "Setiap level permainan harus diselesaikan dalam rentang waktu tertentu. Pembagian ukuran tebakan dan batas waktu penyelesaian ditentukan sebagai berikut:\n"
-                                )
+                                  text:
+                                      "gambar pertama dan kedua akan terus terbuka. ",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+
+                                TextSpan(
+                                  text:
+                                      "Namun, apabila gambar kedua bukanlah pasangannya, maka gambar yang pertama dan kedua akan ",
+                                ),
+
+                                TextSpan(
+                                  text: "tertutup kembali.\n\n",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+
+                                TextSpan(
+                                  text:
+                                      "Setiap level permainan harus diselesaikan dalam rentang waktu tertentu. Pembagian ukuran tebakan dan batas waktu penyelesaian ditentukan sebagai berikut:\n",
+                                ),
                               ],
-                            )
+                            ),
                           ),
 
                           // ===== KETENTUAN =====
-                          levelPoint("Level 1", "ukuran tebakan = 2x2, durasi timer = 20 detik."),
+                          levelPoint(
+                            "Level 1",
+                            "ukuran tebakan = 2x2, durasi timer = 20 detik.",
+                          ),
                           SizedBox(height: 6),
-                          levelPoint("Level 2", "ukuran tebakan = 2x4, durasi timer = 40 detik."),
+                          levelPoint(
+                            "Level 2",
+                            "ukuran tebakan = 2x4, durasi timer = 40 detik.",
+                          ),
                           SizedBox(height: 6),
-                          levelPoint("Level 3", "ukuran tebakan = 3x4, durasi timer = 60 detik."),
+                          levelPoint(
+                            "Level 3",
+                            "ukuran tebakan = 3x4, durasi timer = 60 detik.",
+                          ),
 
                           // ===== PENJELASAN SKOR =====
                           Text.rich(
                             TextSpan(
-                              text: "\nSetiap gambar yang berhasil dicocokan dengan pasangannya memberikan ",
+                              text:
+                                  "\nSetiap gambar yang berhasil dicocokan dengan pasangannya memberikan ",
                               children: [
                                 TextSpan(
                                   text: "skor sebesar 10 poin bagi pemain.",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 TextSpan(
-                                  text: " Apabila pemain kehabisan waktu, maka pemain akan dianggap "
+                                  text:
+                                      " Apabila pemain kehabisan waktu, maka pemain akan dianggap ",
                                 ),
                                 TextSpan(
-                                    text: "kalah.",
-                                    style: TextStyle(fontWeight: FontWeight.bold)
+                                  text: "kalah.",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                              ]
-                            )
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -274,10 +305,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         label: const Text(
           "Play",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 17
-          )
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         icon: const Icon(Icons.play_arrow_outlined),
         tooltip: 'Play',
@@ -296,7 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Text.rich(
             TextSpan(
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               children: [
                 TextSpan(
@@ -308,7 +336,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             style: TextStyle(fontSize: 14),
           ),
-        )
+        ),
       ],
     );
   }
@@ -323,38 +351,38 @@ class _MyHomePageState extends State<MyHomePage> {
               user!.username,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.w500
+                fontWeight: FontWeight.w500,
               ),
             ),
             accountEmail: Text(
               "${user!.username}@gmail.com",
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
             currentAccountPicture: CircleAvatar(
               backgroundImage: NetworkImage("https://i.pravatar.cc/150"),
             ),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface
+              color: Theme.of(context).colorScheme.surface,
             ),
           ),
           ListTile(
             title: const Text("High score"),
             leading: const Icon(Icons.sports_score),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, 'highscore');
+            },
           ),
           ListTile(
             title: Text(
-                "Logout",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.error,
-                )
+              "Logout",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
             leading: Icon(
-                Icons.logout_rounded,
-                color: Theme.of(context).colorScheme.error,
+              Icons.logout_rounded,
+              color: Theme.of(context).colorScheme.error,
             ),
             onTap: () {
               doLogout();
@@ -362,11 +390,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           ListTile(
             title: Text(
-                "Result",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.error,
-                )
+              "Result",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
             leading: Icon(
               Icons.receipt_rounded,
@@ -380,11 +408,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   'score': 100,
                   'mistakes': 2,
                   'moves': 14,
-                  'user': 'canonflow'
-                }
+                  'user': 'canonflow',
+                },
               );
             },
-          )
+          ),
         ],
       ),
     );

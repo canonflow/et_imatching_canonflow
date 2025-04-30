@@ -24,11 +24,10 @@ class MatchImage{
   }
 }
 
-/** Max Image => 12 (for 3x4)
- * Level 1 (2x2) => needs 2 pairs
- * Level 2 (2x4) => needs 4 pairs
- * level 3 (3x4) => needs 6 pairs
- */
+/// Max Image => 12 (for 3x4)
+/// Level 1 (2x2) => needs 2 pairs
+/// Level 2 (2x4) => needs 4 pairs
+/// level 3 (3x4) => needs 6 pairs
 
 var images = <MatchImage>[
   MatchImage(image: "./assets/images/apple.png", name: "Apple"),
