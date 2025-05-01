@@ -1,52 +1,109 @@
 import 'package:et_imatching_canonflow/components/themeAppBar.dart';
-import 'package:et_imatching_canonflow/models/User.dart';
+import 'package:et_imatching_canonflow/providers/ThemeProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:et_imatching_canonflow/models/User.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/animation.dart';
 
-import '../providers/ThemeProvider.dart';
-
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Get arguments
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+  State<ResultScreen> createState() => _ResultScreenState();
+}
 
+class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scoreScaleAnimation;
+  late Animation<double> _statsOpacityAnimation;
+  late Animation<Offset> _buttonSlideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    _scoreScaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.elasticOut),
+      ),
+    );
+
+    _statsOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.3, 0.8, curve: Curves.easeIn),
+      ),
+    );
+
+    _buttonSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, 2),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeOutBack),
+      ),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final score = args['score'] ?? 0;
     final moves = args['moves'] ?? 0;
     final mistakes = args['mistakes'] ?? 0;
     final user = args['user'] ?? "No user";
 
-    ThemeProvider _themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: themeAppBar(
         context,
         "RESULT",
-        _themeProvider,
+        Provider.of<ThemeProvider>(context),
         Theme.of(context).colorScheme.surfaceContainer,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildScoreCard(context, score),
+            ScaleTransition(
+              scale: _scoreScaleAnimation,
+              child: _buildScoreCard(context, score),
+            ),
             const SizedBox(height: 20),
-            _buildStatsRow(context, moves, mistakes),
+            FadeTransition(
+              opacity: _statsOpacityAnimation,
+              child: _buildStatsRow(context, moves, mistakes),
+            ),
             const SizedBox(height: 30),
             _buildHighScoreSection(context, user, score),
             const Spacer(),
-            _buildActionButtons(context),
+            SlideTransition(
+              position: _buttonSlideAnimation,
+              child: _buildActionButtons(context),
+            ),
           ],
         ),
       ),
     );
   }
-}
 
+  
 Widget _buildScoreCard(BuildContext context, int score) {
   return Card(
     elevation: 4,
@@ -95,93 +152,120 @@ Widget _buildStatsRow(BuildContext context, int moves, int mistakes) {
   );
 }
 
-Widget _buildStatItem(
-  BuildContext context, {
-  required IconData icon,
-  required String label,
-  required String value,
-}) {
-  return Column(
-    children: [
-      Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
-      const SizedBox(height: 8),
-      Text(label, style: Theme.of(context).textTheme.bodyLarge),
-      Text(
-        value,
-        style: Theme.of(
-          context,
-        ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+  // Add particle animation for new high score
+  Widget _buildHighScoreSection(BuildContext context, String user, int currentScore) {
+    return FutureBuilder<int?>(
+      future: User(username: user).FindHighScore(),
+      builder: (context, snapshot) {
+        final highScore = snapshot.data ?? 0;
+        final isNewHighScore = currentScore > highScore;
+
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Column(
+              children: [
+                Text(
+                  'Current High Score',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 10),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: Text(
+                    key: ValueKey<int>(isNewHighScore ? currentScore : highScore),
+                    isNewHighScore ? currentScore.toString() : highScore.toString(),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (isNewHighScore)
+              _buildCelebrationAnimation(),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCelebrationAnimation() {
+    return RotationTransition(
+      turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
+      child: const Icon(
+        Icons.celebration,
+        size: 40,
+        color: Colors.amber,
       ),
-    ],
-  );
-}
+    );
+  }
 
-Widget _buildHighScoreSection(
-  BuildContext context,
-  String user,
-  int currentScore,
-) {
-  return FutureBuilder<int?>(
-    future: User(username: user).FindHighScore(),
-    builder: (context, snapshot) {
-      final highScore = snapshot.data ?? 0;
-      final isNewHighScore = currentScore > highScore;
-
-      return Column(
-        children: [
-          Text(
-            'Current High Score',
-            style: Theme.of(context).textTheme.titleLarge,
+  Widget _buildStatItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - _statsOpacityAnimation.value)),
+          child: Opacity(
+            opacity: _statsOpacityAnimation.value,
+            child: child,
           ),
-          const SizedBox(height: 10),
+        );
+      },
+      child: Column(
+        children: [
+          Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(height: 8),
+          Text(label, style: Theme.of(context).textTheme.bodyLarge),
           Text(
-            isNewHighScore ? currentScore.toString() : highScore.toString(),
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
         ],
-      );
-    },
-  );
-}
+      ),
+    );
+  }
 
-Widget _buildActionButtons(BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch, // Makes buttons full-width
-    children: [
-      Container(
-        margin: const EdgeInsets.only(bottom: 12), // External spacing
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+  // Add hover animation to buttons
+  Widget _buildActionButtons(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildAnimatedButton(context, 'Play Again', () => Navigator.pop(context)),
+        _buildAnimatedButton(context, 'Leaderboard', () => Navigator.pushNamed(context, 'highscore')),
+        _buildAnimatedButton(context, 'Back to Home', 
+          () => Navigator.popUntil(context, (route) => route.isFirst)),
+      ],
+    );
+  }
+
+  Widget _buildAnimatedButton(BuildContext context, String text, VoidCallback onPressed) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: MouseRegion(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          transform: Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            ),
+            onPressed: onPressed,
+            child: Text(text),
           ),
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Play Again'),
         ),
       ),
-      Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          ),
-          onPressed: () => Navigator.pushNamed(context, 'highscore'),
-          child: const Text('Leaderboard'),
-        ),
-      ),
-      Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          ),
-          onPressed:
-              () => Navigator.popUntil(context, (route) => route.isFirst),
-          child: const Text('Back to Home'),
-        ),
-      ),
-    ],
-  );
+    );
+  }
 }
